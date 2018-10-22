@@ -32,6 +32,7 @@ namespace GameOfLife.Logic
         public bool IsWorldStable { get; private set; }
         public bool IsRunning { get; private set; }
 
+        private Mutex mutex = new Mutex();
 
         private void GenerateWorld(int startCount, Random random)
         {
@@ -63,58 +64,62 @@ namespace GameOfLife.Logic
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 UpdateWorld();
                 stopwatch.Stop();
-                Thread.Sleep(1000 - (int)stopwatch.ElapsedMilliseconds);
+                Thread.Sleep(1000 - (int)stopwatch.ElapsedMilliseconds > 0 ? 1000 - (int)stopwatch.ElapsedMilliseconds : 0);
             }
             IsRunning = false;
         }
 
         private void UpdateWorld()
         {
-            lock (world)
+            mutex.WaitOne();
+
+            previousStepWorld = (bool[,])world.Clone();
+
+            for (int y = 0; y < Height; y++)
             {
-                previousStepWorld = (bool[,])world.Clone();
-
-                for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
                 {
-                    for (int x = 0; x < Width; x++)
+                    int neighbourCount = 0;
+
+                    for (int j = -1; j <= 1; j++)
                     {
-                        int neighbourCount = 0;
-
-                        for (int j = -1; j <= 1; j++)
+                        for (int i = -1; i <= 1; i++)
                         {
-                            for (int i = -1; i <= 1; i++)
-                            {
-                                if (y + j >= 0 && y + j < Height && x + i >= 0 && x + i < Width && !(j == 0 && i == 0) && world[y + j, x + i])
-                                    neighbourCount++;
-                            }
+                            if (y + j >= 0 && y + j < Height && x + i >= 0 && x + i < Width && !(j == 0 && i == 0) && world[y + j, x + i])
+                                neighbourCount++;
                         }
-
-                        if (neighbourCount == 3)
-                            world[y, x] = true;
-                        else if (neighbourCount != 2 && world[y, x])
-                            world[y, x] = false;
-
                     }
-                }
 
-                AliveCount = world.Cast<bool>().Where(b => b).Count();
-                IsWorldStable = previousStepWorld.Cast<bool>().SequenceEqual(world.Cast<bool>());
+                    if (neighbourCount == 3)
+                        world[y, x] = true;
+                    else if (neighbourCount != 2 && world[y, x])
+                        world[y, x] = false;
+
+                }
             }
+
+            AliveCount = world.Cast<bool>().Where(b => b).Count();
+            IsWorldStable = previousStepWorld.Cast<bool>().SequenceEqual(world.Cast<bool>());
+
+            mutex.ReleaseMutex();
         }
 
         public string GetVisualWorld()
         {
-            lock (world)
+            mutex.WaitOne();
+
+            string image = "";
+            for (int y = 0; y < Height; y++)
             {
-                string image = "";
-                for (int y = 0; y < Height; y++)
-                {
-                    for (int x = 0; x < Width; x++)
-                        image += world[y, x] ? InformationManager.LifeCell : InformationManager.DeadCell;
-                    //image += '\n';
-                }
-                return image;
+                for (int x = 0; x < Width; x++)
+                    image += world[y, x] ? InformationManager.LifeCell : InformationManager.DeadCell;
+                //image += '\n';
             }
+            
+            mutex.ReleaseMutex();
+
+            return image;
+
         }
     }
 }

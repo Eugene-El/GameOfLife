@@ -82,8 +82,12 @@ namespace GameOfLife.Logic.Managers
                     else
                     {
                         int worldNumber = h / tableHeight * 3 + w / tableWidth;
+
+                        int x = w % tableWidth -1,
+                            y = h % tableHeight - 1;
+
                         if (worldNumber < visualWorlds.Count)
-                            Console.Write(visualWorlds[h / tableHeight + w / tableWidth][(w - tableWidth * (w / tableWidth) - 1) * (h - tableHeight * (h / tableHeight) - 1)]);
+                            Console.Write(visualWorlds[worldNumber][ x + y * GameManager.WorldWidth ]);
                         else
                             Console.Write(' ');
                     }

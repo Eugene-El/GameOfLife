@@ -97,8 +97,14 @@ namespace GameOfLife.Logic.Managers
 
         public static void Stop()
         {
-            for (int i = 0; i < GameCount; i++)
-                games[i].Stop();
+            lock (games)
+                games.ForEach(g => g.Stop());
+        }
+
+        public static void Continue()
+        {
+            lock (games)
+                games.ForEach(g => g.Continue());
         }
 
         public static List<string> GetVisualWorlds(List<int> indexes)

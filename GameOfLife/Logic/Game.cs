@@ -16,11 +16,14 @@ namespace GameOfLife.Logic
         {
             Height = height;
             Width = width;
-            AliveCount = startCount;
+            aliveCount = startCount;
 
             world = new bool[Height, Width];
 
             GenerateWorld(startCount, random);
+
+            isRunning = true;
+            isWorldStable = false;
         }
 
         public int Width { get; }
@@ -28,10 +31,14 @@ namespace GameOfLife.Logic
 
         private bool[,] world;
         private bool[,] previousStepWorld;
-        
-        public int AliveCount { get; private set; }
-        public bool IsWorldStable { get; private set; }
-        public bool IsRunning { get; private set; }
+        private bool isStopped;
+        private int aliveCount;
+        private bool isWorldStable;
+        private bool isRunning;
+
+        public int AliveCount { get { return aliveCount; } }
+        public bool IsWorldStable { get { return isWorldStable; } }
+        public bool IsRunning { get { return isRunning; } }
 
         [NonSerialized]
         private Mutex mutex;
@@ -61,21 +68,25 @@ namespace GameOfLife.Logic
         {
             mutex = new Mutex();
 
-            IsRunning = true;
-            IsWorldStable = false;
             while (AliveCount > 0 && !IsWorldStable)
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                UpdateWorld();
+                if (!isStopped)
+                    UpdateWorld();
                 stopwatch.Stop();
                 Thread.Sleep(1000 - (int)stopwatch.ElapsedMilliseconds > 0 ? 1000 - (int)stopwatch.ElapsedMilliseconds : 0);
             }
-            IsRunning = false;
+            isRunning = false;
         }
 
         public void Stop()
         {
-            
+            isStopped = true;
+        }
+
+        public void Continue()
+        {
+            isStopped = false;
         }
 
         private void UpdateWorld()
@@ -107,8 +118,8 @@ namespace GameOfLife.Logic
                 }
             }
 
-            AliveCount = world.Cast<bool>().Where(b => b).Count();
-            IsWorldStable = previousStepWorld.Cast<bool>().SequenceEqual(world.Cast<bool>());
+            aliveCount = world.Cast<bool>().Where(b => b).Count();
+            isWorldStable = previousStepWorld.Cast<bool>().SequenceEqual(world.Cast<bool>());
 
             mutex.ReleaseMutex();
         }

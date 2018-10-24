@@ -18,9 +18,20 @@ namespace GameOfLife.Logic.Managers
         {
             while (true)
             {
-                var k = Console.ReadKey();
-                if (k.KeyChar == 's')
-                    GameManager.Stop();
+                var key = Console.ReadKey();
+
+                switch (key.Key)
+                {
+                    case ConsoleKey.S:
+                        GameManager.Stop();
+                        InformationManager.Stop();
+                        break;
+
+                    case ConsoleKey.C:
+                        GameManager.Continue();
+                        InformationManager.Continue();
+                        break;
+                }
             }
         }
 

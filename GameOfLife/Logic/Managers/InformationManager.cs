@@ -20,6 +20,8 @@ namespace GameOfLife.Logic.Managers
 
         public static List<int> WorldIndexes { get; }
 
+        private static bool isStoped;
+
         public static void Start()
         {
             Life();
@@ -29,23 +31,35 @@ namespace GameOfLife.Logic.Managers
         {
             while (true)
             {
-                Console.Clear();
+                if (!isStoped)
+                {
+                    Console.Clear();
 
-                DrawWorlds();
+                    DrawWorlds();
 
-                Console.SetCursorPosition(0, 27);
+                    Console.SetCursorPosition(0, 27);
 
-                Console.Write("Games count: " + GameManager.GameCount +
-                    " | Running game count: " + GameManager.RunningGamesCount +
-                    " | Total liveform count: " + GameManager.TotalLiveformCount +
-                    " | Average liveform count: " + GameManager.AverageLiveformCount);
+                    Console.Write("Games count: " + GameManager.GameCount +
+                        " | Running game count: " + GameManager.RunningGamesCount +
+                        " | Total liveform count: " + GameManager.TotalLiveformCount +
+                        " | Average liveform count: " + GameManager.AverageLiveformCount);
 
-                Console.SetCursorPosition(0, 29);
-                Console.Write("> ");
-
+                    Console.SetCursorPosition(0, 29);
+                    Console.Write("> ");
+                }
                 Thread.Sleep(1000);
             }
 
+        }
+
+        public static void Stop()
+        {
+            isStoped = true;
+        }
+
+        public static void Continue()
+        {
+            isStoped = false;
         }
 
         private static void DrawWorlds()

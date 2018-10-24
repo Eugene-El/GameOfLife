@@ -1,6 +1,7 @@
 ﻿using GameOfLife.Logic.Managers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,12 +13,16 @@ namespace GameOfLife.Logic
         public void Show()
         {
             string answer;
+            bool isBackupWorld;
             do
             {
                 Console.Clear();
+                isBackupWorld = File.Exists(GameManager.BackupFileName);
                 Console.WriteLine("======================= GAME OF LIFE =======================\n");
                 Console.WriteLine("  1. Start games");
-                Console.WriteLine("  2. Exit");
+                if (isBackupWorld)
+                    Console.WriteLine("  2. Resume previous games");
+                Console.WriteLine("  {0}. Exit", isBackupWorld ? 3 : 2);
 
                 Console.WriteLine("\n============================================================\n");
 
@@ -33,6 +38,11 @@ namespace GameOfLife.Logic
                     break;
 
                 case "2":
+                    if (isBackupWorld)
+                        ResumePreviousGames();
+                    break;
+
+                default:
                     break;
             }
         }
@@ -61,6 +71,14 @@ namespace GameOfLife.Logic
 
 
             GameManager.Start(gameCount, worldHeight, worldWidth, startCount);
+            InputManager.Start();
+            InformationManager.Start();
+        }
+
+        private void ResumePreviousGames()
+        {
+            GameManager.ResumePreviousGames();
+            InputManager.Start();
             InformationManager.Start();
         }
     }

@@ -40,6 +40,9 @@ namespace GameOfLife.Logic.Managers
                     " | Total liveform count: " + GameManager.TotalLiveformCount +
                     " | Average liveform count: " + GameManager.AverageLiveformCount);
 
+                Console.SetCursorPosition(0, 29);
+                Console.Write("> ");
+
                 Thread.Sleep(1000);
             }
 

@@ -43,9 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Logic\Game.cs" />
+    <Compile Include="Logic\Managers\ExitManager.cs" />
     <Compile Include="Logic\Managers\GameManager.cs" />
     <Compile Include="Logic\Managers\InformationManager.cs" />
+    <Compile Include="Logic\Managers\InputManager.cs" />
     <Compile Include="Logic\Menu.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,9 +56,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

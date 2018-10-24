@@ -1,6 +1,9 @@
-﻿using System;
+﻿using GameOfLife.Helpers;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +14,8 @@ namespace GameOfLife.Logic.Managers
         private static List<Game> games = new List<Game>();
         private static Random random = new Random();
 
+        public static string BackupFileName = "GameOfLife.wrld";
+
         public static int GameCount { get { return games.Count; } }
         public static int RunningGamesCount { get { return games.Where(g => g.IsRunning).Count(); } }
         public static int TotalLiveformCount { get { return games.Sum(g => g.AliveCount); } }
@@ -18,6 +23,31 @@ namespace GameOfLife.Logic.Managers
 
         public static int WorldWidth { get; private set; }
         public static int WorldHeight { get; private set; }
+
+        static GameManager()
+        {
+            ExitManager.ApplicationExitEvent += GameManagerDestructor;
+        }
+
+        private static void GameManagerDestructor(object sender, EventArgs e)
+        {
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream fs = new FileStream(BackupFileName, FileMode.Create))
+                {
+                    lock (games)
+                    {
+                        formatter.Serialize(fs, games);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                throw ex;
+            }
+        }
 
         public static void Start(int gameCount, int height, int width, int startCount)
         {
@@ -38,6 +68,37 @@ namespace GameOfLife.Logic.Managers
             }
 
             games.ForEach(g => g.Start());
+        }
+
+        public static void ResumePreviousGames()
+        {
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream fs = new FileStream(BackupFileName, FileMode.Open))
+                {
+                    games = (List<Game>)formatter.Deserialize(fs);
+                }
+                WorldWidth = games.FirstOrDefault()?.Width ?? 0;
+                WorldHeight = games.FirstOrDefault()?.Height ?? 0;
+
+                for(int i = 0; i < (9 < GameCount? 9 : GameCount); i++)
+                    InformationManager.WorldIndexes.Add(i);
+
+                games.ForEach(g => g.Start());
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                throw ex;
+            }
+        }
+
+
+        public static void Stop()
+        {
+            for (int i = 0; i < GameCount; i++)
+                games[i].Stop();
         }
 
         public static List<string> GetVisualWorlds(List<int> indexes)

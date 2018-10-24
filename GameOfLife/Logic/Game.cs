@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace GameOfLife.Logic
 {
+    [Serializable]
     public class Game
     {
         public Game(int height, int width, int startCount, Random random)
@@ -27,12 +28,13 @@ namespace GameOfLife.Logic
 
         private bool[,] world;
         private bool[,] previousStepWorld;
-
+        
         public int AliveCount { get; private set; }
         public bool IsWorldStable { get; private set; }
         public bool IsRunning { get; private set; }
 
-        private Mutex mutex = new Mutex();
+        [NonSerialized]
+        private Mutex mutex;
 
         private void GenerateWorld(int startCount, Random random)
         {
@@ -57,6 +59,8 @@ namespace GameOfLife.Logic
 
         private void Life()
         {
+            mutex = new Mutex();
+
             IsRunning = true;
             IsWorldStable = false;
             while (AliveCount > 0 && !IsWorldStable)
@@ -67,6 +71,11 @@ namespace GameOfLife.Logic
                 Thread.Sleep(1000 - (int)stopwatch.ElapsedMilliseconds > 0 ? 1000 - (int)stopwatch.ElapsedMilliseconds : 0);
             }
             IsRunning = false;
+        }
+
+        public void Stop()
+        {
+            
         }
 
         private void UpdateWorld()

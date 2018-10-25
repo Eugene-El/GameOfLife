@@ -49,25 +49,24 @@ namespace GameOfLife.Logic
 
         private void StartGames()
         {
-            // TODO rafactor
             int gameCount, worldHeight, worldWidth, startCount;
             Console.Write("\n\n");
             do
             {
                 Console.Write("Game count: ");
-            } while (!int.TryParse(Console.ReadLine(), out gameCount) && gameCount >= 0);
+            } while (!int.TryParse(Console.ReadLine(), out gameCount) || gameCount <= 0);
             do
             {
                 Console.Write("World height (3-7): ");
-            } while (!int.TryParse(Console.ReadLine(), out worldHeight) && worldHeight >= 3 && worldHeight <= 11);
+            } while (!int.TryParse(Console.ReadLine(), out worldHeight) || worldHeight < 3 || worldHeight > 7);
             do
             {
                 Console.Write("World width (3-37): ");
-            } while (!int.TryParse(Console.ReadLine(), out worldWidth) && worldWidth >= 3 && worldWidth <= 38);
+            } while (!int.TryParse(Console.ReadLine(), out worldWidth) || worldWidth < 3 || worldWidth > 37);
             do
             {
                 Console.Write("Start lifeforms count (3-" + (worldWidth * worldHeight - 1) +  "): ");
-            } while (!int.TryParse(Console.ReadLine(), out startCount) && startCount >= 3 && startCount <= (worldWidth * worldHeight - 1));
+            } while (!int.TryParse(Console.ReadLine(), out startCount) || startCount < 3 || startCount > (worldWidth * worldHeight - 1));
 
 
             GameManager.Start(gameCount, worldHeight, worldWidth, startCount);

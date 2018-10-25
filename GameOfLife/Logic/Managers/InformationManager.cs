@@ -123,6 +123,9 @@ namespace GameOfLife.Logic.Managers
             {
                 for (int w = 0; w < tableWidth * 3; w++)
                 {
+                    int worldNumber = h / tableHeight * 3 + w / tableWidth;
+                    Console.ForegroundColor = GameManager.IsWorldRunning(WorldIndexes[worldNumber]) ? ConsoleColor.DarkGreen : ConsoleColor.Red;
+
                     if (h % tableHeight == 0)
                     {
                         if (w % tableWidth == 0)
@@ -147,7 +150,6 @@ namespace GameOfLife.Logic.Managers
                     }
                     else
                     {
-                        int worldNumber = h / tableHeight * 3 + w / tableWidth;
 
                         int x = w % tableWidth -1,
                             y = h % tableHeight - 1;
@@ -157,6 +159,8 @@ namespace GameOfLife.Logic.Managers
                         else
                             Console.Write(' ');
                     }
+
+                    Console.ResetColor();
                 }
                 Console.Write('\n');
             }

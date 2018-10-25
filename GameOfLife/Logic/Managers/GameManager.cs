@@ -109,6 +109,11 @@ namespace GameOfLife.Logic.Managers
                 games.ForEach(g => g.Continue());
         }
 
+        public static bool IsWorldRunning(int index)
+        {
+            return (index >= 0 && index < GameCount)? games[index].IsRunning : false;
+        }
+
         public static string[] GetVisualWorlds(int[] indexes)
         {
             string[] visualWorlds = new string[9];

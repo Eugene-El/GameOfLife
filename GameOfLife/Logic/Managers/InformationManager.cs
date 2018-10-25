@@ -154,7 +154,7 @@ namespace GameOfLife.Logic.Managers
                         int x = w % tableWidth -1,
                             y = h % tableHeight - 1;
 
-                        if (visualWorlds[worldNumber] != "")
+                        if (visualWorlds[worldNumber] != null)
                             Console.Write(visualWorlds[worldNumber][ x + y * GameManager.WorldWidth ]);
                         else
                             Console.Write(' ');

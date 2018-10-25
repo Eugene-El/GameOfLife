@@ -12,13 +12,15 @@ namespace GameOfLife.Logic.Managers
         static InformationManager()
         {
             Console.OutputEncoding = Encoding.UTF8;
-            WorldIndexes = new List<int>();
+            WorldIndexes = new int[9];
+            for (int i = 0; i < 9; i++)
+                WorldIndexes[i] = -1;
         }
 
         public static char LifeCell = '■'; //'\u2588'; // Another version
         public static char DeadCell = '\u25ab'; //'▪';
 
-        public static List<int> WorldIndexes { get; }
+        public static int[] WorldIndexes { get; }
 
         private static bool isStoped;
 
@@ -62,9 +64,56 @@ namespace GameOfLife.Logic.Managers
             isStoped = false;
         }
 
+        public static void ShowCamerasMenu()
+        {
+            do
+            {
+                Console.Clear();
+
+                Console.WriteLine("\nCamera: world number");
+                for (int i = 0; i < 9; i++)
+                {
+                    Console.WriteLine("  " + i + ": " + WorldIndexes[i]);
+                }
+
+                Console.WriteLine("\nDo you want to change camera view? [y/n]");
+
+                string answer;
+                do
+                {
+                    Console.Write("> ");
+                    answer = Console.ReadLine();
+                } while (answer != "y" && answer != "Y" && answer != "n" && answer != "N");
+                if (answer == "n" || answer == "N") break;
+
+                Console.WriteLine("\nWhich camera you want to change? (0 - 8)");
+
+                bool incorrectAnswer = true;
+                int cameraTochange, worldToShow;
+                do
+                {
+                    Console.Write("> ");
+                    incorrectAnswer = ! int.TryParse(Console.ReadLine(), out cameraTochange);
+                } while (incorrectAnswer || cameraTochange < 0 || cameraTochange > 8);
+
+
+                Console.WriteLine("\nWhich world you want to show on " + cameraTochange + " camera? (0 - " + (GameManager.GameCount-1) + ")");
+
+                incorrectAnswer = true;
+                do
+                {
+                    Console.Write("> ");
+                    incorrectAnswer = !int.TryParse(Console.ReadLine(), out worldToShow);
+                } while (incorrectAnswer || worldToShow < 0 || worldToShow > (GameManager.GameCount - 1));
+
+                WorldIndexes[cameraTochange] = worldToShow;
+
+            } while (true);
+        }
+
         private static void DrawWorlds()
         {
-            List<string> visualWorlds = GameManager.GetVisualWorlds(WorldIndexes);
+            string[] visualWorlds = GameManager.GetVisualWorlds(WorldIndexes);
 
             int tableWidth = GameManager.WorldWidth + 2,
                 tableHeight = GameManager.WorldHeight + 2;
@@ -103,7 +152,7 @@ namespace GameOfLife.Logic.Managers
                         int x = w % tableWidth -1,
                             y = h % tableHeight - 1;
 
-                        if (worldNumber < visualWorlds.Count)
+                        if (visualWorlds[worldNumber] != "")
                             Console.Write(visualWorlds[worldNumber][ x + y * GameManager.WorldWidth ]);
                         else
                             Console.Write(' ');

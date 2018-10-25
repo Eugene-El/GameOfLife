@@ -31,6 +31,15 @@ namespace GameOfLife.Logic.Managers
                         GameManager.Continue();
                         InformationManager.Continue();
                         break;
+
+                    case ConsoleKey.Enter:
+                        InformationManager.Stop();
+                        GameManager.Stop();
+                        Thread.Sleep(200); // Fix information manager thread
+                        InformationManager.ShowCamerasMenu();
+                        InformationManager.Continue();
+                        GameManager.Continue();
+                        break;
                 }
             }
         }

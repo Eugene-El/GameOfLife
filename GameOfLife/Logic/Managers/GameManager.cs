@@ -33,6 +33,8 @@ namespace GameOfLife.Logic.Managers
         {
             try
             {
+                Stop();
+                InformationManager.Stop();
                 BinaryFormatter formatter = new BinaryFormatter();
                 using (FileStream fs = new FileStream(BackupFileName, FileMode.Create))
                 {
@@ -64,7 +66,7 @@ namespace GameOfLife.Logic.Managers
             for (int i = 0; i < gameCount; i++)
             {
                 games.Add(new Game(height, width, startCount, random));
-                if (i < 9) InformationManager.WorldIndexes.Add(i);
+                if (i < 9) InformationManager.WorldIndexes[i] = i;
             }
 
             games.ForEach(g => g.Start());
@@ -83,9 +85,9 @@ namespace GameOfLife.Logic.Managers
                 WorldHeight = games.FirstOrDefault()?.Height ?? 0;
 
                 for(int i = 0; i < (9 < GameCount? 9 : GameCount); i++)
-                    InformationManager.WorldIndexes.Add(i);
+                    InformationManager.WorldIndexes[i] = i;
 
-                games.ForEach(g => g.Start());
+                games.ForEach(g => { g.Start(); g.Continue(); });
             }
             catch (Exception ex)
             {
@@ -107,11 +109,12 @@ namespace GameOfLife.Logic.Managers
                 games.ForEach(g => g.Continue());
         }
 
-        public static List<string> GetVisualWorlds(List<int> indexes)
+        public static string[] GetVisualWorlds(int[] indexes)
         {
-            List<string> visualWorlds = new List<string>();
-            for (int i = 0; i < (indexes.Count < 9 ? indexes.Count : 9); i++)
-                visualWorlds.Add(games[indexes[i]].GetVisualWorld());
+            string[] visualWorlds = new string[9];
+            for (int i = 0; i < 9; i++)
+                if (indexes[i] != -1)
+                    visualWorlds[i] = games[indexes[i]].GetVisualWorld();
             return visualWorlds;
         }
     }
